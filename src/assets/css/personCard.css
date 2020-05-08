@@ -1,0 +1,113 @@
+.team-members {
+		min-width: 75rem;
+		padding: 2.5rem auto;
+		padding-top: 6.25rem;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		background-color: #333;
+	}
+
+	/*= common css to all effects =*/
+	.single-member {
+		width: 280px;
+		float: left;
+		margin: 50px 2.5%;
+		background-color: #fff;
+		text-align: center;
+		position: relative;
+	}
+
+	.member-image img {
+		max-width:  8.75rem;
+		vertical-align: middle;
+	}
+
+	h3 {
+		font-size: 24px;
+		font-weight: normal;
+		margin: 10px 0 0;
+		text-transform: uppercase;
+	}
+
+	h5 {
+		font-size: 16px;
+		font-weight: 300;
+		margin: 0 0 15px;
+		line-height: 22px;
+	}
+
+	p {
+		font-size: 14px;
+		font-weight: 300;
+		line-height: 22px;
+		padding: 0 30px;
+		margin-bottom: 10px;
+	}
+
+	.social-touch a {
+		color: #FFFFFF;
+		border: 1px solid #ffffff;
+		border-radius: 30px;
+		text-decoration: none;
+		padding: 0.125rem 0.3125rem;
+		display: inline-block;
+		vertical-align: middle;
+		margin: 5px 15px;
+		opacity: 0.7;
+		transition: 0.3s;
+	}
+
+	.social-touch a:hover {
+		opacity: 1;
+		transition: 0.3s;
+	}
+	/*= common css to all effects end =*/
+
+	/*= effect-1 css =*/
+	.effect-1 {
+		border-radius: 5px 5px 0 0;
+		padding-bottom: 40px;
+	}
+
+	.effect-1 .member-image {
+		border: 2px solid #fff;
+		border-radius: 60px 0;
+		display: inline-block;
+		margin-top: -72px;
+		overflow: hidden;
+		transition: 0.3s;
+	}
+
+	.effect-1 .social-touch {
+		background: #1D4350;  /* fallback for old browsers */
+		background: -webkit-linear-gradient(to right, #A43931, #1D4350);  /* Chrome 10-25, Safari 5.1-6 */
+		background: linear-gradient(to right, #A43931, #1D4350); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+		position: absolute;
+		left: 0;
+		bottom: 0;
+		height: 2px;
+		overflow: hidden;
+		padding: 5px 0 0 2px;
+		width: 100%;
+		transition: 0.3s;
+	}
+
+	.effect-1 .member-image img {
+		transition: 0.3s;
+		border-radius: 40% 0;
+	}
+
+	.effect-1:hover .member-image {
+		border-color: #F2F6FC;
+		transition: 0.3s;
+		border-radius: 50%;
+	}
+
+	.effect-1:hover .social-touch {
+		padding: 6px 0;
+		height: 38px;
+		transition: 0.3s;
+	}
+
+	/*= effect-1 css end =*/

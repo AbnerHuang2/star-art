@@ -1,0 +1,161 @@
+
+
+.el-carousel {
+	display: block;
+	//margin-top: 10px;
+}
+
+.el-carousel__item img {
+	width: 100%;
+	height: 100%;
+}
+
+.el-carousel__item:nth-child(2n) {
+	background: #1a2a6c;
+	/* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #fdbb2d, #b21f1f, #1a2a6c);
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #fdbb2d, #b21f1f, #1a2a6c);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+.el-carousel__item:nth-child(2n+1) {
+	background: #283c86;
+	/* fallback for old browsers */
+	background: -webkit-linear-gradient(to right, #45a247, #283c86);
+	/* Chrome 10-25, Safari 5.1-6 */
+	background: linear-gradient(to right, #45a247, #283c86);
+	/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
+/* 公开课 */
+.publicClass {}
+
+.el-card {
+	border: 0;
+}
+
+.el-card span {
+	font-weight: bold;
+}
+
+/*卡片布局*/
+.el-card:hover {
+	color: firebrick;
+}
+
+.image {
+	width: 100%;
+	//height: 11.25rem;
+	display: block;
+}
+
+/* .image:hover{
+		transition: all 1s;
+		transform: scale(1.1);
+		-ms-transform: scale(1.1);
+	} */
+
+.time {
+	font-size: 13px;
+	color: #999;
+}
+
+.bottom {
+	margin-top: 13px;
+	line-height: 12px;
+}
+
+.button {
+	padding: 0;
+	float: right;
+}
+/* 清除浮动 */
+.clearfix:before,
+.clearfix:after {
+	display: block;
+	content: "";
+}
+
+.clearfix:after {
+	clear: both
+}
+/* /清除浮动 */
+
+/* /卡片布局 */
+/* my-card */
+.mycard-group {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	padding: 1.25rem 0;
+}
+
+.mycard {
+	position: relative;
+	width: 280px;
+	height: 17.5rem;
+	margin-left: 0.9375rem;
+	margin-bottom: 0.625rem;
+	border-radius: 10px;
+}
+
+/* .mycard:first-child {
+	margin-left: 0;
+}
+
+.mycard:nth-child(2n+1) {
+	margin-top: 0;
+} */
+
+.mycard:hover {
+	cursor: pointer;
+}
+
+.mycard:hover .title {
+	color: firebrick;
+}
+
+.mycard-info {
+	padding: 0.3125rem 0.625rem;
+}
+
+.mycard-info .title {
+	font-weight: bold;
+}
+
+.tag-line {
+	width: 100%;
+	height: 1.875rem;
+	color: gray;
+}
+
+.tag-line span {
+	font-size: 0.75rem;
+	margin: 0.625rem;
+	cursor: pointer;
+}
+
+.price {
+	float: right;
+	color: firebrick;
+	font-weight: bold;
+}
+/* /my-card */
+
+/* 公开课 */
+
+/* fancy */
+.fancy {
+	padding: 1.25rem 0;
+	border-bottom: 1px solid #CCCCCC;
+	//box-shadow: 0px -10px 0px 0px #FFFFFF,
+		/*上边阴影  红色*/
+		//-10px 0px 0px 0px #FFFFFF,
+		/*左边阴影  绿色*/
+		//10px 0px 0px 0px #FFFFFF,
+		/*右边阴影  蓝色*/
+		//0px 1px 4px 1px #CCCCCC;
+		/*下边阴影  黄色*/
+}
+/* / fancy */
