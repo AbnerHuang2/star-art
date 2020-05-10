@@ -29,7 +29,7 @@
 			return{
 				teacherList:[],
 				total: 100,
-				pageSize:10,
+				pageSize:6,
 				currentPage:1,
 			}
 		},
@@ -45,12 +45,17 @@
 				}).then(res => {
 					if(res.data.code==200){
 						this.teacherList = res.data.data.list;
+						this.total = res.data.data.total;
 					}
 				})
-			}
+			},
+			handlePageChange(currentPage){
+				this.currentPage = currentPage;
+				this.getTeachers(this.currentPage,this.pageSize);
+			},
 		},
 		created() {
-			this.getTeachers(1,6);
+			this.getTeachers(this.currentPage,this.pageSize);
 		}
 	}
 </script>

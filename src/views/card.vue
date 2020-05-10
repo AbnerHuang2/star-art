@@ -68,8 +68,8 @@
 				}, 200);
 			},
 			toSomewhere(){
-				alert("别点我"+this.to);
-				//this.$router.push('/')
+				this.$parent.clickCard(this.to);
+				this.$parent.getUserById(this.to.belongId);
 			}
 		}
 

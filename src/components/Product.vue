@@ -12,13 +12,14 @@
 				<el-tab-pane v-for="(m,i) in major" :key="i" :label="m.majorName" :name="i+''">
 					<el-row>
 						<el-button v-for="(detail,i) in directList" :key="i" size="mini" 
-						@click="getCourseBydirect(detail.id)">{{detail.directName}}</el-button>
+						@click="getProductsBydirect(detail.id)">{{detail.directName}}</el-button>
 					</el-row>
 				</el-tab-pane>
 			</el-tabs>
 		</div>
 		<div class="card-group" style="padding: 1.875rem 0rem 2.5rem 0rem;">
-			<card v-for="(obj,index) in productList" :key="index" :to="obj.productName" :data-image="obj.productUrl">
+			<card v-for="(obj,index) in productList" :key="index" :to="obj" 
+			:data-image="obj.productUrl">
 				<!-- <h1 slot="header">{{obj.productName}}</h1> -->
 				<p slot="content">{{obj.productIntro}}</p>
 			</card>
@@ -29,6 +30,27 @@
 			:total="total" :current-page="currentPage" @current-change="handlePageChange" hide-on-single-page>
 			</el-pagination>
 		</div>
+		
+		<!-- cardDialig -->
+		<el-dialog title="查看作品" :visible.sync="cardDialog">
+			<div v-if="cardObj!=null" style="width: 70%;">
+				<el-image :src="cardObj.productUrl"></el-image>
+				<div class="product-bottom">
+					<div class="person-info">
+						<el-avatar v-if="cardUser!=null" :size="50" :src="cardUser.userAvatarURL"></el-avatar>
+					</div>
+					<div class="product-info">
+						<h3>{{cardObj.productName}}</h3>
+						<a class="a-btn">
+							<svg t="1588943012344" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2428" width="20" height="20"><path d="M470.24 284.48a173.888 173.888 0 0 0-245.664 0 173.824 173.824 0 0 0 0 245.632l271.488 271.488 271.488-271.488a173.888 173.888 0 0 0 0-245.664 173.824 173.824 0 0 0-245.632 0l-25.856 25.856-25.824-25.824z" fill="#F83B57" p-id="2429"></path><path d="M480 16v64a16 16 0 1 0 32 0v-64a16 16 0 1 0-32 0z m242.144 56.32l-32 55.424a16 16 0 1 0 27.712 16l32-55.424a16 16 0 1 0-27.712-16z m181.536 169.824l-55.424 32a16 16 0 0 0 16 27.712l55.424-32a16 16 0 0 0-16-27.712zM976 480h-64a16 16 0 1 0 0 32h64a16 16 0 1 0 0-32z m-56.32 242.144l-55.424-32a16 16 0 0 0-16 27.712l55.424 32a16 16 0 0 0 16-27.712z m-169.824 181.536l-32-55.424a16 16 0 0 0-27.712 16l32 55.424a16 16 0 0 0 27.712-16zM512 976v-64a16 16 0 1 0-32 0v64a16 16 0 1 0 32 0z m-242.144-56.32l32-55.424a16 16 0 0 0-27.712-16l-32 55.424a16 16 0 0 0 27.712 16zM88.32 749.856l55.424-32a16 16 0 0 0-16-27.712l-55.424 32a16 16 0 0 0 16 27.712zM16 512h64a16 16 0 1 0 0-32h-64a16 16 0 1 0 0 32z m56.32-242.144l55.424 32a16 16 0 1 0 16-27.712l-55.424-32a16 16 0 1 0-16 27.712zM242.144 88.32l32 55.424a16 16 0 1 0 27.712-16l-32-55.424a16 16 0 1 0-27.712 16z" fill="#84EBF1" p-id="2430"></path></svg>
+							<span>{{cardObj.productLike}}</span>
+						</a>
+						<p>{{cardObj.productIntro}}</p>
+					</div>
+				</div>
+			</div>
+		</el-dialog>
+		<!-- /cardDialig -->
 	</div>
 </template>
 
@@ -50,12 +72,22 @@
 				productList:[],
 				directId:null,
 				lastTag:null,
+				cardDialog:false,
+				cardObj:null,
+				cardUser:null,
 			}
 		},
 		methods:{
 			handleClick(){
 				//获取相关专业的具体
 				this.getDirectsByMajor(this.major[Number(this.activeName)].id);
+				
+				//获取相关作品
+				this.getProducts(this.major[Number(this.activeName)].id,null);
+			},
+			clickCard(obj){
+				this.cardDialog=true
+				this.cardObj = obj;
 			},
 			getMajors(){
 				this.$ajax({
@@ -65,6 +97,10 @@
 					this.major = res.data.data;
 					//获取相关专业的方向
 					this.getDirectsByMajor(this.major[Number(this.activeName)].id);
+					
+					//获取相关作品
+					this.getProducts(this.major[Number(this.activeName)].id,null);
+					
 				})
 			},
 			getDirectsByMajor(majorId){
@@ -77,6 +113,11 @@
 				}).then(res => {
 					this.directList = res.data.data;
 				})
+			},
+			getProductsBydirect(directId){
+				//每次点击专业方向的时候修改this.directId的值
+				this.directId = directId;
+				this.getProducts(this.major[Number(this.activeName)].id,directId,this.lastTag);
 			},
 			getProducts(majorId,directId,tag,page,pageSize){
 				this.$ajax({
@@ -102,6 +143,24 @@
 					}
 				})
 			},
+			getUserById(id){
+				this.$ajax({
+					url: this.global.serverSrc+'/user/getUser',
+					method: 'post',
+					params:{
+						id,
+					}
+				}).then(res => {
+					console.log(res)
+					if(res.data.code==200){
+						this.cardUser = res.data.data;
+					}else{
+						this.$notify.error({
+							title: res.data.message,
+						});
+					}
+				})
+			},
 			handlePageChange(currentPage){
 				this.currentPage = currentPage;
 				this.getProducts(this.major[Number(this.activeName)].id,this.directId,this.lastTag,this.currentPage);
@@ -110,7 +169,6 @@
 		},
 		created() {
 			this.getMajors();
-			this.getProducts(1,null);
 		}
 	}
 </script>
@@ -144,15 +202,23 @@
 			}
 		}
 	}
-	
-	.el-card {
-		margin-top: 0.625rem;
-		
-		&:nth-child(2n){
-			margin-top: 1.25rem;
-			color: cyan;
-		}
-		
+	.product-bottom{
+		display: flex;
+		justify-content: left;
+		align-items: center;
 	}
-	
+	.person-info{
+		padding: 1.25rem;
+	}
+	.product-info{
+		display: inline-block;
+	}
+
+	.a-btn{
+		text-decoration: none;
+		display: flex;
+		align-items: center;
+		color: #333333;
+	}
+
 </style>

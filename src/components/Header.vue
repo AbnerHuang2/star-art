@@ -17,9 +17,11 @@
 			<div class="loginBtn">
 				<el-button v-if="!user" icon="el-icon-user-solid" @click="showModal=true">登录/注册</el-button>
 				<div class="demo-type" v-else>
-					<el-avatar :size="40" src="../../public/head.png">
-						<img src="../../public/head.png" @click="showPersonInfo" />
-					</el-avatar>
+					<el-avatar :size="40" :src="user.userAvatarURL"></el-avatar>
+					<ul class="avatar-options">
+						<li @click="showPersonInfo">个人中心</li>
+						<li @click="logout">退出登录</li>
+					</ul>
 				</div>
 				<el-input style="margin-right: 1.875rem;" placeholder="搜我试试" prefix-icon="el-icon-search" v-model="globalInput">
 				</el-input>
@@ -79,12 +81,34 @@
 			closeDialog(user){
 				this.showModal = false;
 				this.user = user;
+				this.global.user = user;
+				if(user!=null){
+					//重新刷新页面
+					this.$router.go(0)
+				}
 			},
 			showPersonInfo(){
 				this.$router.push('/person')
 			},
-			async getUserInfo(){
-				await axios({
+			logout(){
+				axios({
+					url: this.global.serverSrc + "/member/logout",
+					method: "get",
+					
+				}).then(res => {
+					if(res.data.code==200){
+						this.$notify.success({
+							title: "已退出",
+						});
+						this.user = null;
+						this.global.user = null;
+						//重新刷新页面
+						this.$router.go(0)
+					}
+				})
+			},
+			getUserInfo(){
+				axios({
 					url: this.global.serverSrc + "/",
 					method: "get",
 					
@@ -93,8 +117,10 @@
 						this.user = res.data.data;
 						this.global.user = res.data.data;
 					}
+
 				})
-			}
+			},
+			
 		},
 		created() {
 			this.getUserInfo();
@@ -102,7 +128,8 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+	@import url('https://fonts.googleapis.com/css?family=Roboto:400,700');
 	.header-container {
 		width: 100%;
 		display: flex;
@@ -168,4 +195,38 @@
 	.loginBtn .el-button:hover {
 		color: snow;
 	}
+	
+	.demo-type{
+		position: relative;
+	}
+	.avatar-options{
+		width: 5.4rem;
+		margin: 0;
+		padding: 2px;
+		position: absolute;
+		left: -30px;
+		opacity: 0;
+		background-color: #FFFFFF;
+		border-radius: 5px;
+		
+		li{
+			list-style-type: none;
+			color: #2c3e50;
+			text-align: center;
+			font-family: 'Roboto', sans-serif;
+			font-size: 0.85rem;
+			font-weight: 700;
+			letter-spacing: 0.2rem;
+			padding: 5px 2px;
+			
+			&:hover{
+				color: #c0392b;
+				background-color: #ecf0f1;
+			}
+		}
+	}
+	.demo-type:hover .avatar-options{
+		opacity: 1;
+	}
+	
 </style>

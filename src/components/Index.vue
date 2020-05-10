@@ -383,7 +383,7 @@
 				setTimeout(() => {
 					if(this.global.user!=null){
 						//判断用户是否选了专业
-						if(this.global.user.userTags==null){
+						if(this.global.user.userDirections==null){
 							this.tagChooseDialog = true;
 						}
 					}

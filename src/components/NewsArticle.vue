@@ -5,6 +5,10 @@
 				<el-input v-model="title" size="large " placeholder="请输入标题(最多50字)"></el-input>
 			</div>
 			<tinymce-editor v-model="tinymceHtml" :height="600" :disabled="false" ref="editor"></tinymce-editor>
+			<el-col style="margin: 1.25rem 0;">
+				<el-input type="textarea" :rows="2" placeholder="请输入摘要(最多50个字)" v-model="intro">
+				</el-input>
+			</el-col>
 		</div>
 		<div class="option">
 			<el-button type="success" @click="dialogPreview = true">预览</el-button>
@@ -15,11 +19,10 @@
 				</div>
 				<div v-html="tinymceHtml"></div>
 				<div style="margin: 1.25rem; text-align: center;">
-					<el-button v-if="tinymceHtml!='' " type="primary">发布</el-button>
+					<el-button type="primary" @click="pubArticle">发布</el-button>
 				</div>
 			</el-dialog>
-			<el-button type="primary">保存</el-button>
-			<el-button type="primary">发布</el-button>
+			<el-button type="primary" @click="pubArticle">发布</el-button>
 		</div>
 	</div>
 </template>
@@ -33,11 +36,46 @@
 		data() {
 			return {
 				title: "",
-				tinymceHtml: 'Welcome to Use Tinymce Editor',
+				tinymceHtml: '',
+				intro:'',
 				dialogPreview:false,
 				circleUrl: "https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png",
 			}
-		}
+		},
+		methods:{
+			pubArticle(){
+				if(this.title==''||this.tinymceHtml==''||this.intro==''){
+					this.$notify.warning('标题或内容或摘要不能为空哦');
+					return;
+				}
+				alert("发布中");
+				this.$ajax({
+					url: this.global.serverSrc+'/news/addNews',
+					method: 'post',
+					params:{
+						newsTitle:this.title,
+						newsContent:this.tinymceHtml,
+						newsIntro:this.intro,
+					}
+				}).then(res =>{
+					console.log(res)
+					if(res.data.code==200){
+						this.$notify.success(res.data.message);
+						
+						//进入信息列表
+						this.$router.push({
+							path: '/community' ,
+							// query:{
+							// 	course:JSON.stringify(obj)
+							// }
+						})
+					}
+				})
+			},
+		},
+		created() {
+			
+		},
 	}
 </script>
 
