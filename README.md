@@ -1,5 +1,7 @@
 # star-art
 
+星星艺术网站前台
+
 ## Project setup
 ```
 npm install
