@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<div class="modal-content">
-				<el-button class="login-weixin">
+				<!-- <el-button class="login-weixin">
 					<div class="btn-weixin">
 						<svg t="1585467487553" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3331"
 							width="200" height="200">
@@ -31,7 +31,7 @@
 						</svg>
 						<span>使用微信一键登录</span>
 					</div>
-				</el-button>
+				</el-button> -->
 				<div class="login-btn">
 					<el-button :class="loginStyle=='0'?'form-show':'form-hidden'" @click="loginStyle='1'">
 						使用账号密码登录

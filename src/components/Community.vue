@@ -19,8 +19,8 @@
 				<ul style="padding: 0;margin: 0;" v-infinite-scroll="load" infinite-scroll-disabled="disabled">
 					<li v-for="(obj,key) in newsList" :key="key" style="list-style: none;padding: 0;margin: 0;">
 						<div class="blog-card">
-							<div class="blog-left">
-								<el-avatar :size="60" :src="obj.user.userAvatarURL"></el-avatar>
+							<div class="blog-left" @click="showPersonInfo(obj.user.id)">
+								<el-avatar :size="60" :src="obj.user.userAvatarURL" ></el-avatar>
 							</div>
 							<div class="blog-right">
 								<div class="blog-center" @click="clickNews(obj)">
@@ -183,6 +183,15 @@
 		},
 		
 		methods: {
+			showPersonInfo(id){
+				// this.$router.push('/person')
+				this.$router.push({
+					path: '/person' ,
+					query:{
+						id,
+					}
+				})
+			},
 			writeArticle(){
 				//先判断用户是否登录
 				if(this.global.user==null){
@@ -389,9 +398,10 @@
 						pageSize,
 					}
 				}).then(res => {
+					console.log(res)
 					if(res.data.code==200){
 						this.newsList = this.newsList.concat(res.data.data.list);
-						this.total = res.data.data.total;
+						this.total = res.data.data.pages;
 					}
 				})
 			},

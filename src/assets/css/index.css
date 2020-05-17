@@ -37,6 +37,8 @@
 
 .el-card span {
 	font-weight: bold;
+	overflow:hidden;
+	white-space: nowrap;
 }
 
 /*卡片布局*/
@@ -46,15 +48,16 @@
 
 .image {
 	width: 100%;
-	//height: 11.25rem;
+	min-height: 8rem;
+	height: 100%;
 	display: block;
 }
 
-/* .image:hover{
+.image:hover{
 		transition: all 1s;
 		transform: scale(1.1);
 		-ms-transform: scale(1.1);
-	} */
+	}
 
 .time {
 	font-size: 13px;

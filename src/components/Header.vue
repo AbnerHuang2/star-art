@@ -15,12 +15,19 @@
 			</div>
 			<!-- 头像 -->
 			<div class="loginBtn">
-				<el-button v-if="!user" icon="el-icon-user-solid" @click="showModal=true">登录/注册</el-button>
+				<el-button class="loginBt" v-if="!user" icon="el-icon-user-solid" @click="showModal=true">登录/注册</el-button>
 				<div class="demo-type" v-else>
-					<el-avatar :size="40" :src="user.userAvatarURL"></el-avatar>
+					<div @click="showPersonInfo">
+						<el-avatar :size="40" :src="user.userAvatarURL"></el-avatar>
+					</div>
 					<ul class="avatar-options">
 						<li @click="showPersonInfo">个人中心</li>
-						<li @click="logout">退出登录</li>
+						<li>
+							<el-popconfirm title="确定退出登录吗" confirmButtonText="是 的" 
+							cancelButtonText="再想想" @onConfirm="logout">
+								<span type="text" slot="reference">退出登录</span>
+							</el-popconfirm>
+						</li>
 					</ul>
 				</div>
 				<el-input style="margin-right: 1.875rem;" placeholder="搜我试试" prefix-icon="el-icon-search" v-model="globalInput">
@@ -88,7 +95,13 @@
 				}
 			},
 			showPersonInfo(){
-				this.$router.push('/person')
+				// this.$router.push('/person')
+				this.$router.push({
+					path: '/person' ,
+					query:{
+						id:this.user.id,
+					}
+				})
 			},
 			logout(){
 				axios({
@@ -102,6 +115,10 @@
 						});
 						this.user = null;
 						this.global.user = null;
+						//如果在person页面，退出到首页
+						if(this.$route.path == '/person'){
+							this.$router.push('/')
+						}
 						//重新刷新页面
 						this.$router.go(0)
 					}
@@ -179,7 +196,7 @@
 		padding-right: 1.25rem;
 	}
 
-	.loginBtn .el-button {
+	.loginBtn .loginBt {
 		border-radius: 1.25rem;
 		box-shadow: 0 2px 5px rgba(0, 0, 0, .2);
 		font-weight: bold;
@@ -192,7 +209,7 @@
 		/* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 	}
 
-	.loginBtn .el-button:hover {
+	.loginBtn .loginBt:hover {
 		color: snow;
 	}
 	

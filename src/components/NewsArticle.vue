@@ -48,16 +48,17 @@
 					this.$notify.warning('标题或内容或摘要不能为空哦');
 					return;
 				}
-				alert("发布中");
-				this.$ajax({
-					url: this.global.serverSrc+'/news/addNews',
-					method: 'post',
-					params:{
-						newsTitle:this.title,
-						newsContent:this.tinymceHtml,
-						newsIntro:this.intro,
+				const formData = new FormData();
+				formData.append("newsTitle",this.title);
+				formData.append("newsContent",this.tinymceHtml);
+				formData.append("newsIntro",this.intro);
+				let config = {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
 					}
-				}).then(res =>{
+				};
+				this.$ajax.post(this.global.serverSrc+'/news/addNews',formData,config)
+				.then(res =>{
 					console.log(res)
 					if(res.data.code==200){
 						this.$notify.success(res.data.message);
@@ -71,6 +72,7 @@
 						})
 					}
 				})
+				
 			},
 		},
 		created() {
