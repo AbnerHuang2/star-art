@@ -36,55 +36,27 @@
 			<div class="news-content">
 				<div v-html="newsVo.news.newsContent"></div>
 			</div>
-			<div class="comment">
-				<div class="comment-header">
-					<h3 v-if="totalComment!=0">{{totalComment}}条评论</h3>
-					<h3 v-else>暂无评论</h3>
-				</div>
-				<div class="comment-write">
-					<el-row :gutter="20">
-						<el-col :span="18">
-							<el-input v-model="commentContent"></el-input>
-						</el-col>
-						<el-col :span="6">
-							<el-button type="primary" @click="pubComment">发布</el-button>
-						</el-col>
-					</el-row>
-				</div>
-				<div class="comment-show">
-					<div class="comment-item" v-for="(obj,i) in commentVoList" :key="i">
-						<el-avatar :src='obj.user.userAvatarURL' :size="50"></el-avatar>
-						<div class="content">
-							<span class="comment-name">{{obj.user.userNickName}}</span>
-							<span class="comment-time">{{obj.comment.commentCreatetime}}</span>
-							<p>{{obj.comment.commentContent}}</p>
-						</div>
-					</div>
-					<div style="text-align: center;margin: 1.875rem; 0">
-						<el-pagination background layout="prev, pager, next" :page-size="pageSize" 
-						:total="totalComment" :current-page="currentPage" @current-change="handlePageChange" hide-on-single-page>
-						</el-pagination>
-					</div>
-				</div>
+			<!-- 评论 -->
+			<div>
+				<comment :entityType="1" :entityId="newsVo.news.id" :pubButton="true"></comment>
 			</div>
+			<!-- 评论 -->
 		</div>
 	</div>
 </template>
 
 <script>
-	
+	import comment from "../views/comment-dialog.vue"
 	export default{
+		components:{
+			comment,
+		},
 		data(){
 			return{
 				newsVo:{},
 				follow:false,
-				commentContent:'',
 				content:'<h2>你好吗</h2>',
 				circleUrl:'https://cube.elemecdn.com/0/88/03b0d39583f48206768a7534e55bcpng.png',
-				commentVoList:[],
-				totalComment:0,
-				pageSize:6,
-				currentPage:1,
 			}
 		},
 		methods:{
@@ -155,75 +127,12 @@
 					}
 				})
 			},
-			getComment(entityId,sort,page,pageSize){
-				this.$ajax({
-					url: this.global.serverSrc+'/comment/getComments',
-					method: 'post',
-					params:{
-						entityId,
-						entityType:1,
-						sort,
-						page,
-						pageSize,
-					}
-				}).then(res => {
-					if(res.data.code==200){
-						this.commentVoList = res.data.data.list;
-						this.totalComment = res.data.data.total;
-					}
-				})
-			},
-			pubComment(){
-				//先判断用户是否登录
-				if(this.global.user==null){
-					this.$message({
-						message: '请先登录',
-						type: 'warning'
-					});
-					return;
-				}
-				if(this.commentContent==''){
-					this.$message({
-						message: '评论不能为空',
-						type: 'warning'
-					});
-					return;
-				}
-				this.$ajax({
-					url: this.global.serverSrc+'/comment/addComment',
-					method: 'post',
-					params:{
-						entityId:this.newsVo.news.id,
-						entityType:1,
-						commentContent:this.commentContent,
-					}
-				}).then(res =>{
-					if(res.data.code==200){
-						this.$notify.success(res.data.message);
-						//关闭评论框
-						this.commentDialog = false;
-						//清空输入框
-						this.commentContent = '';
-						//刷新commentList
-						this.getComment(this.newsVo.news.id,null,this.currentPage,this.pageSize)
-						
-					}else{
-						this.$notify.error(res.data.message);
-					}
-				})
-			},
-			handlePageChange(currentPage){
-				this.currentPage = currentPage;
-				//获取分页数据
-				this.getComment(this.newsVo.news.id,null,this.currentPage,this.pageSize)
-			},
 			getRouterData() {
 				this.newsVo = JSON.parse(this.$route.query.newsVo)
 			},
 		},
 		created() {
 			this.getRouterData()
-			this.getComment(this.newsVo.news.id,null,this.currentPage,this.pageSize)
 		}
 	}
 </script>
@@ -276,60 +185,6 @@
 	.news-content{
 		padding: 1.25rem;
 		//border: 1px solid darkgray;
-	}
-	.comment{
-		width: 80%;
-		margin: 1.25rem auto;
-		padding: 1.25rem;
-		box-shadow: 0 0 0 1px #ecf0f1;
-		border: 1px solid #bdc3c7;
-		
-		
-	}
-	.comment-header{
-		h3{
-			font-family: 'Roboto', sans-serif;
-			font-size: 1.2rem;
-			font-weight: 700;
-		}
-	}
-	.comment-write{
-		padding: 20px 5%;
-	}
-	.comment-show{
-		
-	}
-	.comment-item {
-		display: flex;
-		justify-content: left;
-		align-items: center;
-		padding: 0.625rem;
-		font-family: 'Roboto', sans-serif;
-	
-		.content {
-			margin-left: 0.625rem;
-			padding: 0.625rem;
-			width: 90%;
-	
-			.comment-name {
-				margin-left: 0.625rem;
-				font-size: 0.9rem;
-				font-weight: 700;
-			}
-	
-			.comment-time {
-				float: right;
-				margin-right: 0.625rem;
-				font-size: 0.9rem;
-				color: grey;
-			}
-	
-			p {
-				margin-top: 1rem;
-				text-indent: 1em;
-				font-size: 0.98rem;
-			}
-		}
 	}
 	
 </style>

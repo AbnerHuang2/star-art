@@ -2,12 +2,12 @@
 	<div class="person">
 		<div class="p-header">
 			<div v-if="form!=null" class="head-img" style="text-align: center; color: #1abc9c;" 
-			@click="avatarDialig=true">
+			@click="clickAvatar">
 				<el-avatar style="width: 100%; height: 100%;" :src="form.userAvatarURL"></el-avatar>
 				<h2>{{form.userNickName}}</h2>
 			</div>
 			
-			<div v-if="form!=null&&form.id != global.user.id" class="follow" @click="follow()">
+			<div v-if="form!=null&&global.user!=null&&form.id != global.user.id" class="follow" @click="follow()">
 				<el-tooltip class="item" effect="dark" :content="followed ? '取消关注':'关注'" placement="bottom">
 					<svg t="1589535208355" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2533"
 					width="50" height="50">
@@ -48,24 +48,25 @@
 			<a :style="nav==2 ? 'color: darkcyan;':'' "  @click="clickSelectCourse">
 				<div class="nav-item">
 					<h3 :style="selectCourseList.length==0 ? 'opacity: 0;':''">{{total}}</h3>
-					<span>已学课程</span>
+					<span v-if="form.status==1">已学课程</span>
+					<span v-else>所授课程</span>
 				</div>
 			</a>
-			<a :style="nav==3 ? 'color: darkcyan;':'' " @click="nav=3">
+			<!-- <a :style="nav==3 ? 'color: darkcyan;':'' " @click="nav=3">
 				<div class="nav-item">
-					<h3>5</h3>
+					<h3 >5</h3>
 					<span>作品</span>
 				</div>
-			</a>
-			<a :style="nav==4 ? 'color: darkcyan;':'' " @click="nav=4">
+			</a> -->
+			<a :style="nav==4 ? 'color: darkcyan;':'' " @click="clickFollow">
 				<div class="nav-item">
-					<h3>3</h3>
+					<h3 :style="followList.length==0 ? 'opacity: 0;':''">{{followNum}}</h3>
 					<span>关注</span>
 				</div>
 			</a>
-			<a :style="nav==5 ? 'color: darkcyan;':'' " @click="nav=5">
+			<a :style="nav==5 ? 'color: darkcyan;':'' " @click="clickFans">
 				<div class="nav-item">
-					<h3>2</h3>
+					<h3 :style="fansList.length==0 ? 'opacity: 0;':''">{{fansNum}}</h3>
 					<span>粉丝</span>
 				</div>
 			</a>
@@ -145,6 +146,9 @@
 			<!-- /个人信息 -->
 			<!-- 已学课程 -->
 			<div v-if="nav==2">
+				<div v-if="selectCourseList.length==0">
+					<h2>暂无选课哦</h2>
+				</div>
 				<el-row :gutter="20" style="margin-bottom: 1.25rem;">
 					<el-col :span="6" v-for="(obj,index) in selectCourseList" :key="index">
 						<el-card class="box-card" :body-style="{ padding: '0' }" style="margin-top: 1.25rem;">
@@ -180,13 +184,13 @@
 			<div v-if="nav==4">
 				<h2>我的关注</h2>
 				<div class="follow-group">
-					<div class="follow-item" v-for="(obj,i) in 4" :key="i">
-						<div class="follow-center">
-							<el-avatar :size="50"></el-avatar>
-							<h3 @click="clickPerson()">Enddy</h3>
+					<div class="follow-item" v-for="(obj,i) in followList" :key="i">
+						<div class="follow-center" @click="clickPerson(obj.id)">
+							<el-avatar :size="50" :src="obj.userAvatarURL"></el-avatar>
+							<h3 >{{obj.userNickName}}</h3>
 						</div>
-						<div class="follow-right">
-							<el-button size="small">取消关注</el-button>
+						<div class="follow-right" v-if="global.user!=null&form.id==global.user.id">
+							<el-button size="small" @click="unfollow(i,obj)">取消关注</el-button>
 						</div>
 					</div>
 				</div>
@@ -196,13 +200,10 @@
 			<div v-if="nav==5">
 				<h2>关注我的</h2>
 				<div class="follow-group">
-					<div class="follow-item" v-for="(obj,i) in 4" :key="i">
-						<div class="follow-center">
-							<el-avatar :size="50"></el-avatar>
-							<h3 @click="clickPerson()">Enddy</h3>
-						</div>
-						<div class="follow-right">
-							<el-button size="small">取消关注</el-button>
+					<div class="follow-item" v-for="(obj,i) in fansList" :key="i">
+						<div class="follow-center" @click="clickPerson(obj.id)">
+							<el-avatar :size="50" :src="obj.userAvatarURL"></el-avatar>
+							<h3>{{obj.userNickName}}</h3>
 						</div>
 					</div>
 				</div>
@@ -220,6 +221,10 @@
 				imageUrl:'',
 				avatarDialig:false,
 				followed:false,
+				followList:[],
+				followNum:0,
+				fansList:[],
+				fansNum:0,
 				nav: 1,
 				editable: false,
 				form: null,
@@ -236,6 +241,11 @@
 			}
 		},
 		methods: {
+			clickAvatar(){
+				if(this.form.id == this.global.user.id){
+					this.avatarDialig = true;
+				}
+			},
 			handleAvatarSuccess(res) {
 				this.imageUrl = res.data;
 
@@ -266,9 +276,33 @@
 			},
 			follow(){
 				if(this.followed){
+					this.$ajax({
+						url: this.global.serverSrc + '/follow/unFollow',
+						method: 'post',
+						params: {
+							entityType:3,
+							entityId:this.form.id
+						}
+					}).then(res => {
+						if(res.data.code == 200){
+							this.$notify.success("已取消关注")
+						}
+					})
 					this.followed = false;
 				}else{
-					this.$notify.success("关注成功")
+					//this.$notify.success("关注成功")
+					this.$ajax({
+						url: this.global.serverSrc + '/follow/follow',
+						method: 'post',
+						params: {
+							entityType:3,
+							entityId:this.form.id
+						}
+					}).then(res => {
+						if(res.data.code == 200){
+							this.$notify.success("关注成功")
+						}
+					})
 					this.followed = true;
 				}
 			},
@@ -328,8 +362,66 @@
 				})
 			},
 			/*关注和粉丝*/
-			clickPerson() {
-				alert("aa")
+			clickFollow(){
+				this.nav=4;
+				this.getFollowList(this.form.id);
+			},
+			unfollow(i,obj){
+				this.$ajax({
+					url: this.global.serverSrc + '/follow/unFollow',
+					method: 'post',
+					params: {
+						entityType:3,
+						entityId:obj.id
+					}
+				}).then(res => {
+					if(res.data.code == 200){
+						this.$notify.success("已取消关注")
+					}
+				})
+				this.followNum--;
+				this.followList.splice(i,1);
+			},
+			clickFans(){
+				this.nav=5;
+				this.getFansList(3,this.form.id);
+			},
+			clickPerson(id) {
+				this.$router.push({
+					path: '/person' ,
+					query:{
+						id,
+					}
+				})
+			},
+			getFollowList(userId){
+				this.$ajax({
+					url: this.global.serverSrc + '/follow/getFollowPeople',
+					method: 'post',
+					params: {
+						userId
+					}
+				}).then(res => {
+					if(res.data.code == 200){
+						this.followList = res.data.data;
+						this.followNum = this.followList.length;
+					}
+				})
+			},
+			getFansList(entityType,entityId){
+				this.$ajax({
+					url: this.global.serverSrc + '/follow/getFans',
+					method: 'post',
+					params: {
+						entityType,
+						entityId
+					}
+				}).then(res => {
+					if(res.data.code == 200){
+						this.fansList = res.data.data;
+						this.fansNum = this.fansList.length;
+					}
+				})
 			},
 			getMajorById(majorId) {
 				this.$ajax({
@@ -393,9 +485,12 @@
 						//获取用户选择的专业
 						this.getUserDirects(this.form.userDirections);
 
-						if (this.id != this.global.user.id) {
+						if (this.global.user!=null && this.id != this.global.user.id) {
 							this.nav = 2;
 							this.getSelectCourses(this.form.id);
+							
+							//获取关注状态
+							this.getFollowStatus(3,this.form.id);
 						}
 
 					}
@@ -436,10 +531,31 @@
 					this.$router.push('/')
 				}
 			},
+			getFollowStatus(){
+				this.$ajax({
+					url: this.global.serverSrc + '/follow/getFollowStatus',
+					method: 'post',
+					params: {
+						entityType:3,
+						entityId:this.form.id
+					}
+				}).then(res => {
+					if(res.data.code == 200){
+						this.followed = res.data.data;
+					}
+				})
+			}
 		},
 		created() {
 			this.getRouterData();
 			this.getUserInfo(this.id);
+		},
+		watch: {
+			// 利用watch方法检测路由变化：
+			'$route': function(to) {
+				// 拿到目标参数 to.query.id 去再次请求数据接口
+				this.getUserInfo(to.query.id)
+			}
 		}
 	}
 </script>

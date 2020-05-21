@@ -29,7 +29,9 @@
 					<el-tab-pane label="课程介绍" name="first">
 						<div class="course-intro">
 							<h2>简介</h2>
-							音乐专业在线课程，录播课程+回放学习+专属学员群+名师答疑。
+							{{course.courseName}}
+							<br>
+							在线课程，录播课程+回放学习+专属学员群+名师答疑。
 							<h2>课程大纲</h2>
 							<h5>声乐初级·唱歌姿势讲解</h5>
 							<h5>声乐初级·介绍三种不同的呼吸方法</h5>
@@ -51,28 +53,8 @@
 						</div>
 					</el-tab-pane>
 					<el-tab-pane label="评 论" name="third">
-						<el-row :gutter="20" v-if="btnText=='开始学习' ">
-							<el-col :span="18">
-								<el-input v-model="commentContent"></el-input>
-							</el-col>
-							<el-col :span="6">
-								<el-button type="primary" @click="pubComment">发布</el-button>
-							</el-col>
-						</el-row>
-						<div class="course-comment">
-							<div class="comment-item" v-for="(obj,i) in commentVoList" :key="i">
-								<el-avatar :src='obj.user.userAvatarURL' :size="50"></el-avatar>
-								<div class="content">
-									<span class="comment-name">{{obj.user.userNickName}}</span>
-									<span class="comment-time">{{obj.comment.commentCreatetime}}</span>
-									<p>{{obj.comment.commentContent}}</p>
-								</div>
-							</div>
-							<div style="text-align: center;margin: 1.875rem; 0">
-								<el-pagination background layout="prev, pager, next" :page-size="pageSize" 
-								:total="totalComment" :current-page="currentPage" @current-change="handlePageChange" hide-on-single-page>
-								</el-pagination>
-							</div>
+						<div>
+							<comment :entityType="2" :entityId="course.id" :pageSize="6" :pubButton="btnText=='开始学习'?true:false"></comment>
 						</div>
 					</el-tab-pane>
 				</el-tabs>
@@ -103,9 +85,10 @@
 </template>
 
 <script>
+	import comment from "../views/comment-dialog.vue"
 	export default {
 		components: {
-
+			comment,
 		},
 		data() {
 			return {
@@ -117,18 +100,11 @@
 				teacher:{},
 				chapterList:[],
 				payDialog:false,
-				commentContent:'',
-				commentVoList:[],
-				totalComment:0,
-				pageSize:3,
-				currentPage:1,
 			}
 		},
 		methods: {
 			handleClick() {
-				if(this.activeName=='third'){
-					this.getComment(this.course.id,null,this.currentPage,this.pageSize)
-				}
+				
 			},
 			chapterClick(index){
 				if(this.btnText == '加入学习'){
@@ -186,63 +162,6 @@
 					}
 				}).then(res => {
 					this.chapterList = res.data.data;
-				})
-			},
-			getComment(entityId,sort,page,pageSize){
-				this.$ajax({
-					url: this.global.serverSrc+'/comment/getComments',
-					method: 'post',
-					params:{
-						entityId,
-						entityType:2,
-						sort,
-						page,
-						pageSize,
-					}
-				}).then(res => {
-					if(res.data.code==200){
-						this.commentVoList = res.data.data.list;
-						this.totalComment = res.data.data.total;
-					}
-				})
-			},
-			pubComment(){
-				//先判断用户是否登录
-				if(this.global.user==null){
-					this.$message({
-						message: '请先登录',
-						type: 'warning'
-					});
-					return;
-				}
-				if(this.commentContent==''){
-					this.$message({
-						message: '评论不能为空',
-						type: 'warning'
-					});
-					return;
-				}
-				this.$ajax({
-					url: this.global.serverSrc+'/comment/addComment',
-					method: 'post',
-					params:{
-						entityId:this.course.id,
-						entityType:2,
-						commentContent:this.commentContent,
-					}
-				}).then(res =>{
-					if(res.data.code==200){
-						this.$notify.success(res.data.message);
-						//关闭评论框
-						this.commentDialog = false;
-						//清空输入框
-						this.commentContent = '';
-						//刷新commentList
-						this.getComment(this.course.id,null,this.currentPage,this.pageSize)
-						
-					}else{
-						this.$notify.error(res.data.message);
-					}
 				})
 			},
 			getRouterData() {

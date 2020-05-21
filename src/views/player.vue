@@ -23,7 +23,7 @@
 			return {
 				player: null,
 				options: {
-					logo: 'https://dss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo_top-e3b63a0b1b.png',
+					logo: this.global.serverSrc+'/file/getImage?name=star.png',
 					video: {
 						url: this.source,
 						type: 'auto',

@@ -33,7 +33,7 @@
 		
 		<!-- cardDialig -->
 		<el-dialog title="查看作品" :visible.sync="cardDialog">
-			<div v-if="cardObj!=null" style="width: 70%;">
+			<div v-if="cardObj!=null">
 				<el-image :src="cardObj.productUrl"></el-image>
 				<div class="product-bottom">
 					<div class="person-info">
@@ -48,6 +48,12 @@
 						<p>{{cardObj.productIntro}}</p>
 					</div>
 				</div>
+				<div class="showComment">
+					<!-- 通过v-if="cardDialog"让组件销毁，再重新加载的方式解决props传值组件不刷新问题 -->
+					<div v-if="cardDialog">
+						<comment :entityType="4" :entityId="productId" :pageSize="6" :pubButton="global.user!=null?true:false"></comment>
+					</div>
+				</div>
 			</div>
 		</el-dialog>
 		<!-- /cardDialig -->
@@ -56,10 +62,12 @@
 
 <script>
 	import card from '../views/card.vue'
+	import comment from "../views/comment-dialog.vue"
 	export default {
 		name: 'Product',
 		components: {
 			card,
+			comment,
 		},
 		data() {
 			return {
@@ -74,6 +82,7 @@
 				lastTag:null,
 				cardDialog:false,
 				cardObj:null,
+				productId:0,
 				cardUser:null,
 			}
 		},
@@ -88,6 +97,7 @@
 			clickCard(obj){
 				this.cardDialog=true
 				this.cardObj = obj;
+				this.productId = obj.id;
 			},
 			getMajors(){
 				this.$ajax({
@@ -219,6 +229,10 @@
 		display: flex;
 		align-items: center;
 		color: #333333;
+	}
+
+	.showComment{
+		
 	}
 
 </style>

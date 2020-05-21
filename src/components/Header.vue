@@ -94,9 +94,9 @@
 					this.$router.go(0)
 				}
 			},
-			showPersonInfo(){
+			async showPersonInfo(){
 				// this.$router.push('/person')
-				this.$router.push({
+				await this.$router.push({
 					path: '/person' ,
 					query:{
 						id:this.user.id,

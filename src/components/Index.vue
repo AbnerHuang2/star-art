@@ -2,7 +2,7 @@
 	<div>
 		<div>
 			<!-- 轮播 -->
-			<el-carousel :interval="5000" arrow="arrow" height="500px">
+			<el-carousel :interval="5000" arrow="arrow" height="400px">
 				<el-carousel-item v-for="(item,index) in sites" :key="index">
 					<img :src="item.imgUrl" alt="">
 				</el-carousel-item>
@@ -61,13 +61,15 @@
 				</el-col>
 				<el-col :span="8">
 					<div class="hot">
-						<el-tabs v-model="activeName" >
-							<el-tab-pane label="社区精选" >
+						<el-tabs v-model="activeName" @tab-click="tabClick">
+							<el-tab-pane label="社区精选" name="1">
 								<div class="hot-pane">
 									<div class="index-blog" v-for="(obj,i) in newsVoList" :key="i">
-										<el-avatar :size="40" :src="obj.user.userAvatarURL"></el-avatar>
+										<div @click="showPersonInfo(obj.user.id)">
+											<el-avatar :size="40" :src="obj.user.userAvatarURL" ></el-avatar>
+										</div>
 										<div class="title">
-											<h3>{{obj.news.newsTitle}} </h3>
+											<h3 @click="clickNews(obj)">{{obj.news.newsTitle}} </h3>
 										</div>
 									</div>
 									<div style="text-align: center;">
@@ -77,12 +79,12 @@
 									</div>
 								</div>
 							</el-tab-pane>
-							<el-tab-pane label="STAR活跃榜" >
-								<h3 style="margin: 20px 0;"><i class="el-icon-sunny"></i>最佳日活跃</h3>
+							<el-tab-pane label="STAR最佳榜" name="2">
+								<h3 style="margin: 20px 0;"><i class="el-icon-sunny"></i>最佳人气</h3>
 								<div class="active-group">
-									<div class="active-card" v-for="(obj,i) in 4" :key="i">
-										<el-avatar :size="40" :src="circleUrl"></el-avatar>
-										<span>艺考小神童</span>
+									<div class="active-card" v-for="(obj,i) in hotUserList" :key="i" @click="showPersonInfo(obj.id)">
+										<el-avatar :size="40" :src="obj.userAvatarURL"></el-avatar>
+										<span>{{obj.userNickName}}</span>
 									</div>
 								</div>
 								<h3 style="margin: 20px 0;"><i class="el-icon-cloudy-and-sunny"></i>最佳周活跃</h3>
@@ -98,81 +100,16 @@
 				</el-col>
 			</el-row>
 			<!-- /第二栏 -->
-
-			<!-- 美术专业 -->
 			<div>
-				<el-row>
-					<el-col :span="12">
-						<h2>美术专业</h2>
-					</el-col>
-					<el-col :span="2" :offset='10' align='middle' style="padding-top: 1.25rem;">
-						<el-tooltip class="item" effect="dark" content="查看更多" placement="bottom">
-							<router-link to="/course">
-								<svg style="width: 2.5rem; height: 2.5rem; " t="1585275691552" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3868" width="200" height="200"><path d="M820.8 944H539.2c-86.4 0-155.2-70.4-155.2-155.2v-46.4c0-86.4 70.4-155.2 155.2-155.2h281.6c86.4 0 155.2 70.4 155.2 155.2v46.4c0 84.8-70.4 155.2-155.2 155.2z" fill="#96E8BA" p-id="3869"></path><path d="M304 465.6c-100.8 0-182.4-81.6-182.4-182.4S203.2 102.4 304 102.4s182.4 81.6 182.4 182.4S404.8 465.6 304 465.6z m0-320c-75.2 0-137.6 62.4-137.6 137.6s62.4 137.6 137.6 137.6 137.6-62.4 137.6-137.6-62.4-137.6-137.6-137.6zM768 462.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128zM368 862.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128zM768 862.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128z" fill="#103E26" p-id="3870"></path><path d="M304 368c-46.4 0-83.2-38.4-83.2-83.2s38.4-83.2 83.2-83.2 83.2 38.4 83.2 83.2S350.4 368 304 368z m0-128c-24 0-44.8 19.2-44.8 44.8s19.2 44.8 44.8 44.8 44.8-19.2 44.8-44.8S328 240 304 240z" fill="#103E26" p-id="3871"></path></svg>
-							</router-link>
-						</el-tooltip>
-					</el-col>
-				</el-row>
-				<!-- 美术卡片组 -->
-				<el-row type="flex" justify="center" :gutter="20">
-					<el-col :span="6" v-for="(obj,index) in homeCourses.artCourseList" :key="index">
-						<el-card :body-style="{ padding: '0' }" style="border: none; box-shadow: none;">
-							<img :src="obj.coverImgurl" class="image" @click="clickCourse(obj)">
-							<div style="padding: 14px;" @click="clickCourse(obj)">
-								<span>{{obj.courseName}}</span>
-								<div class="bottom clearfix">
-									<div class="tag-line">
-										<span v-for="(x,index) in obj.tags.split(';')" :key="index">{{x}}</span>
-									</div>
-									<time class="time">学习人数 {{obj.stuNum}}</time>
-									<span class="price" v-if="obj.cost==0">限时免费</span>
-									<span class="price" v-else>￥{{obj.cost}}</span>
-								</div>
-							</div>
-						</el-card>
-					</el-col>
-				</el-row>
-				<!-- /美术卡片组 -->
+				<!-- 美术专业 -->
+				<course :courseList="homeCourses.artCourseList" title="美术专业" :loadMore="1"></course>
+				<!-- /美术专业 -->
+				<!-- 音乐专业 -->
+				<course :courseList="homeCourses.musicCourseList" title="音乐专业" :loadMore="2"></course>
+				<!-- / 音乐专业 -->
 			</div>
-			<!-- /美术专业 -->
-			<!-- 音乐专业 -->
-			<div class="fancy">
-				<el-row>
-					<el-col :span="12">
-						<h2>音乐专业</h2>
-					</el-col>
-					<el-col :span="2" :offset='10' align='middle' style="padding-top: 1.25rem;">
-						<el-tooltip class="item" effect="dark" content="查看更多" placement="bottom">
-							<router-link to="/course">
-								<svg style="width: 2.5rem; height: 2.5rem; " t="1585275691552" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="3868" width="200" height="200"><path d="M820.8 944H539.2c-86.4 0-155.2-70.4-155.2-155.2v-46.4c0-86.4 70.4-155.2 155.2-155.2h281.6c86.4 0 155.2 70.4 155.2 155.2v46.4c0 84.8-70.4 155.2-155.2 155.2z" fill="#96E8BA" p-id="3869"></path><path d="M304 465.6c-100.8 0-182.4-81.6-182.4-182.4S203.2 102.4 304 102.4s182.4 81.6 182.4 182.4S404.8 465.6 304 465.6z m0-320c-75.2 0-137.6 62.4-137.6 137.6s62.4 137.6 137.6 137.6 137.6-62.4 137.6-137.6-62.4-137.6-137.6-137.6zM768 462.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128zM368 862.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128zM768 862.4h-128c-65.6 0-118.4-52.8-118.4-118.4v-128c0-65.6 52.8-118.4 118.4-118.4h128c65.6 0 118.4 52.8 118.4 118.4v128c0 65.6-52.8 118.4-118.4 118.4z m-128-320c-40 0-73.6 33.6-73.6 73.6v128c0 40 33.6 73.6 73.6 73.6h128c40 0 73.6-33.6 73.6-73.6v-128c0-40-33.6-73.6-73.6-73.6h-128z" fill="#103E26" p-id="3870"></path><path d="M304 368c-46.4 0-83.2-38.4-83.2-83.2s38.4-83.2 83.2-83.2 83.2 38.4 83.2 83.2S350.4 368 304 368z m0-128c-24 0-44.8 19.2-44.8 44.8s19.2 44.8 44.8 44.8 44.8-19.2 44.8-44.8S328 240 304 240z" fill="#103E26" p-id="3871"></path></svg>
-							</router-link>
-						</el-tooltip>
-					</el-col>
-				</el-row>
-				<!-- 音乐卡片组 -->
-				<el-row type="flex" justify="center" :gutter="20">
-					<el-col :span="6" v-for="(obj,index) in homeCourses.musicCourseList" :key="index">
-						<el-card :body-style="{ padding: '0' }" style="border: none; box-shadow: none;">
-							<img :src="obj.coverImgurl" class="image" @click="clickCourse(obj)">
-							<div style="padding: 14px;" @click="clickCourse(obj)">
-								<span>{{obj.courseName}}</span>
-								<div class="bottom clearfix">
-									<div class="tag-line">
-										<span v-for="(x,index) in obj.tags.split(';')" :key="index">{{x}}</span>
-									</div>
-									<time class="time">学习人数 {{obj.stuNum}}</time>
-									<span class="price" v-if="obj.cost==0">限时免费</span>
-									<span class="price" v-else>￥{{obj.cost}}</span>
-								</div>
-							</div>
-						</el-card>
-					</el-col>
-				</el-row>
-				<!-- /音乐卡片组 -->
-			</div>
-			<!-- / 音乐专业 -->
 			<!-- funcy -->
-			<div :class="showFuncy?'showFunny':'funny'" style="position: relative;height: 250px;margin-top: 1.25rem;">
+			<div :class="showFuncy?'showFunny':'funny'" style="position: relative;height: 250px;margin-top: 2rem;">
 				<div class="bubble">看累了吧，放松一下</div>
 				<div class="wrapper">
 					<div class="candles">
@@ -209,7 +146,6 @@
 					</div>
 					<div class="floor">
 					</div>
-
 				</div>
 			</div>
 			<!-- funcy -->
@@ -237,7 +173,7 @@
 							<h5>{{obj.userMajor}}</h5>
 							<p>{{obj.userIntro}}</p>
 							<div class="social-touch">
-								<a href="#">查看更多</a>
+								<a @click="showPersonInfo(obj.id)">查看更多</a>
 								<a href="#">我要咨询</a>
 							</div>
 						</div>
@@ -268,10 +204,12 @@
 <script>
 	import axios from "axios"
 	import card from '../views/card.vue'
+	import course from '../views/course-dialog.vue'
 	export default {
 		name: 'Index',
 		components: {
 			card,
+			course,
 		},
 		data() {
 			return {
@@ -279,23 +217,28 @@
 				homeCourses:[],
 				teacherList:[],
 				newsVoList:[],
-				activeName:'0',
+				hotUserList:[],
+				activeName:'1',
 				showFuncy: false,
 				sites: [{
 						title: '素描几何0基础入门体系课程',
-						imgUrl: 'https://images.pexels.com/photos/1193743/pexels-photo-1193743.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
+						imgUrl: 'http://www.psoneart.com/Uploads/Content/2020-03-23/5e784fa5e0aea.jpg'
+						//'https://images.pexels.com/photos/4370670/pexels-photo-4370670.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
 					},
 					{
 						title: '导师',
-						imgUrl: 'https://images.pexels.com/photos/3977529/pexels-photo-3977529.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
+						imgUrl: "http://www.psoneart.com/Uploads/Content/2020-05-14/5ebcb1e24f057.jpg"
+						// 'http://img02.img.mei-shu.net/Uploads/exhibition/1807/bbesmc5xpuv.jpg'
 					},
 					{
 						title: '作品',
-						imgUrl: 'https://images.pexels.com/photos/3978594/pexels-photo-3978594.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
+						imgUrl: 'http://pic.tianlailive.com/cycllepic/67843/20200424/92b46ff7-fa13-4329-bf3f-af26be10cdba.png'
+						//'https://images.pexels.com/photos/3978594/pexels-photo-3978594.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
 					},
 					{
 						title: '社区',
-						imgUrl: 'https://images.pexels.com/photos/1292241/pexels-photo-1292241.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
+						imgUrl: 'http://pic.tianlailive.com/cycllepic/67843/20200403/ec9369d2-7c5c-463d-a3ee-ad469a1c1034.jpg'
+						//'https://images.pexels.com/photos/1292241/pexels-photo-1292241.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1000'
 					},
 				],
 				tempImg: 'http://www.psoneart.com/Uploads/Content/2018-05-09/5af29c1fcdb84.jpg',
@@ -305,14 +248,49 @@
 			};
 		},
 		methods: {
+			tabClick(){
+				if(this.activeName==2){
+					this.getHotUserList(1,4);
+				}
+			},
 			choosePub(o) {
 				alert("ok" + o);
 			},
+			clickNews(obj){
+				this.$router.push({
+					path: '/newsDetail' ,
+					query:{
+						newsVo:JSON.stringify(obj)
+					}
+				})
+			},
+			showPersonInfo(id){
+				this.$router.push({
+					path: '/person' ,
+					query:{
+						id,
+					}
+				})
+			},
 			showSth() {
 				var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
-				if (scrollTop > 2130) {
+				if (scrollTop > 2000) {
 					this.showFuncy = true;
 				}
+			},
+			getHotUserList(page,pageSize){
+				this.$ajax({
+					url: this.global.serverSrc+'/user/getHotUsers',
+					method: 'post',
+					params:{
+						page,
+						pageSize,
+					}
+				}).then(res => {
+					if(res.data.code==200){
+						this.hotUserList = res.data.data;
+					}
+				})
 			},
 			getNews(page,pageSize){
 				this.$ajax({

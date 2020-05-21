@@ -153,12 +153,12 @@
 	padding: 1.25rem 0;
 	border-bottom: 1px solid #CCCCCC;
 	//box-shadow: 0px -10px 0px 0px #FFFFFF,
-		/*上边阴影  红色*/
+		/*上边阴影  白色*/
 		//-10px 0px 0px 0px #FFFFFF,
-		/*左边阴影  绿色*/
+		/*左边阴影  白色*/
 		//10px 0px 0px 0px #FFFFFF,
-		/*右边阴影  蓝色*/
-		//0px 1px 4px 1px #CCCCCC;
-		/*下边阴影  黄色*/
+		/*右边阴影  白色*/
+		//0px 1px 4px 1px #ecf0f1;
+		/*下边阴影  灰色*/
 }
 /* / fancy */
