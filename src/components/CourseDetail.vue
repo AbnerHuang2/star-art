@@ -1,17 +1,18 @@
 <template>
-	<div>
+	<div v-if="show">
 		<el-row :gutter="20">
 			<!-- 左边 -->
 			<el-col :span="16">
 				<div style="margin: 0.625rem 0 0 1.25rem">
 					<el-breadcrumb separator="/">
 						<el-breadcrumb-item :to="{ path: '/course' }">全部课程</el-breadcrumb-item>
-						<el-breadcrumb-item>美术专业</el-breadcrumb-item>
+						<el-breadcrumb-item v-if="course.directId<5">美术专业</el-breadcrumb-item>
+						<el-breadcrumb-item v-else>音乐专业</el-breadcrumb-item>
 						<el-breadcrumb-item>{{course.courseName}}</el-breadcrumb-item>
 					</el-breadcrumb>
 				</div>
 				<div class="left">
-					<el-image :src="courseImg" fit="cover"></el-image>
+					<el-image :src="course.coverImgurl" fit="cover"></el-image>
 					<div class="left-content">
 						<h2>{{course.courseName}}</h2>
 						<div class="tag-line" style="margin-top: 0.3rem;">
@@ -21,7 +22,7 @@
 						<span class="price" style="float: left;" v-if="course.cost==0">限时免费</span>
 						<span class="price" style="float: left;" v-else>￥{{course.cost}}</span>
 						<div class="clearfix"></div>
-						<el-button v-if="btnText=='开始学习'" type="primary" style="padding:0.625rem 0.8rem;margin-left: 6.25rem" @click="chapterClick(0)">{{btnText}}</el-button>
+						<el-button v-if="btnText=='开始学习'" type="success" style="padding:0.625rem 0.8rem;margin-left: 6.25rem" @click="chapterClick(0)">{{btnText}}</el-button>
 						<el-button v-else type="primary" style="padding:0.625rem 0.8rem;margin-left: 6.25rem" @click="joinLearn(course)">{{btnText}}</el-button>
 					</div>
 				</div>
@@ -76,8 +77,9 @@
 		</el-row>
 		<!-- 支付 Dialog -->
 		<el-dialog title="购买课程" :visible.sync="payDialog">
-			<div>
-				<img :src="courseImg" alt="">
+			<h4>支付</h4>
+			<div style="text-align: center;">
+				<img style="width: 200px;" :src="codeImg" alt="">
 			</div>
 		</el-dialog>
 		<!-- / 支付 Dialog -->
@@ -92,6 +94,7 @@
 		},
 		data() {
 			return {
+				show:false,
 				btnText: '加入学习',
 				teacherAvatar: 'http://www.psoneart.com/Uploads/Content/2018-05-09/5af29c1fcdb84.jpg',
 				activeName: 'second',
@@ -100,6 +103,7 @@
 				teacher:{},
 				chapterList:[],
 				payDialog:false,
+				codeImg:"https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1590634241&di=9319e5e93a126d495da80a4f08d23121&src=http://bpic.588ku.com/element_origin_min_pic/01/42/51/90573d7eb6115f6.jpg",
 			}
 		},
 		methods: {
@@ -118,7 +122,8 @@
 					path: '/coursePlay' ,
 					query: {
 						index,
-						chapterList:JSON.stringify(this.chapterList),
+						courseId:this.course.id
+						//chapterList:JSON.stringify(this.chapterList),
 					},
 				})
 				window.open(routeData.href, '_blank');
@@ -164,8 +169,32 @@
 					this.chapterList = res.data.data;
 				})
 			},
+			getCourse(courseId){
+				this.$ajax({
+					url: this.global.serverSrc+'/course/getSingleCourse',
+					method: 'post',
+					params:{
+						courseId,
+					}
+				}).then(res => {
+					console.log(res)
+					if(res.data.code==200){
+						this.show = true;
+						this.course = res.data.data;
+						this.getTeacher(2);
+						//this.getTeacher(this.course.teacherId);
+						
+						//this.getChapters(this.course.id);
+						//先测试
+						this.getChapters(1);
+						
+					}
+				})
+			},
 			getRouterData() {
-				this.course = JSON.parse(this.$route.query.course)
+				let courseId = this.$route.query.courseId;
+				this.getCourse(courseId);
+				//this.course = JSON.parse(this.$route.query.course)
 			},
 			handlePageChange(currentPage){
 				this.currentPage = currentPage;
@@ -175,17 +204,7 @@
 		},
 		created() {
 			this.getRouterData();
-			//test
-			this.getTeacher(2);
-			//this.getTeacher(this.course.teacherId);
-			//根据课程信息获取相关章节
-			if(this.course!=null){
-				//this.getChapters(this.course.id);
-				//先测试
-				this.getChapters(1);
-			}else{
-				this.getChapters(1);
-			}
+			
 		}
 	}
 </script>

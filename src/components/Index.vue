@@ -17,7 +17,7 @@
 				<!-- 这里打算放课程，导师，作品，社区各一张 -->
 				<div style="width: 94%; margin: 0 auto;">
 					<div class="card-group">
-						<card v-for="(obj,index) in homeStartList" :key="index" :to="obj.title" :data-image="obj.imgUrl">
+						<card v-for="(obj,index) in homeStartList" :key="index" :to="obj.to" :params="obj.params" :data-image="obj.imgUrl">
 							<h1 slot="header">{{obj.title}}</h1>
 							<p slot="content">{{obj.intro}}
 							</p>
@@ -89,9 +89,9 @@
 								</div>
 								<h3 style="margin: 20px 0;"><i class="el-icon-cloudy-and-sunny"></i>最佳周活跃</h3>
 								<div class="active-group">
-									<div class="active-card" v-for="(obj,i) in 4" :key="i">
-										<el-avatar :size="40" :src="circleUrl"></el-avatar>
-										<span>艺考小神童fsdfsadf</span>
+									<div class="active-card" v-for="(obj,i) in hotUserList" :key="i" @click="showPersonInfo(obj.id)">
+										<el-avatar :size="40" :src="obj.userAvatarURL"></el-avatar>
+										<span>{{obj.userNickName}}</span>
 									</div>
 								</div>
 							</el-tab-pane>
@@ -260,7 +260,15 @@
 				this.$router.push({
 					path: '/newsDetail' ,
 					query:{
-						newsVo:JSON.stringify(obj)
+						newsId:obj.news.id
+					}
+				})
+			},
+			clickCourse(course){
+				this.$router.push({
+					path: '/courseDetail' ,
+					query:{
+						courseId:course.id
 					}
 				})
 			},
@@ -331,14 +339,6 @@
 					}
 				})
 			},
-			clickCourse(course){
-				this.$router.push({
-					path: '/courseDetail' ,
-					query:{
-						course:JSON.stringify(course),
-					}
-				})
-			},
 			getHomeTeachers(size){
 				axios({
 					url: this.global.serverSrc + "/teacher/getRecommandTeachers",
@@ -358,14 +358,15 @@
 				this.getHomeTeachers(3);
 				this.getNews(1,5);
 				
-				setTimeout(() => {
-					if(this.global.user!=null){
-						//判断用户是否选了专业
-						if(this.global.user.userDirections==null){
-							this.tagChooseDialog = true;
-						}
-					}
-				}, 1000)
+				//跳出选择专业框
+				// setTimeout(() => {
+				// 	if(this.global.user!=null){
+				// 		//判断用户是否选了专业
+				// 		if(this.global.user.userDirections==null){
+				// 			this.tagChooseDialog = true;
+				// 		}
+				// 	}
+				// }, 1000)
 			}
 		},
 		created() {

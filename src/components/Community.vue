@@ -237,7 +237,7 @@
 				this.$router.push({
 					path: '/newsDetail' ,
 					query:{
-						newsVo:JSON.stringify(obj)
+						newsId:obj.news.id
 					}
 				})
 			},

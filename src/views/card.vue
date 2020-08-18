@@ -18,7 +18,7 @@
 			this.width = this.$refs.card.offsetWidth;
 			this.height = this.$refs.card.offsetHeight;
 		},
-		props: ["dataImage","to"],
+		props: ["dataImage","to","params"],
 		data: () => ({
 			width: 0,
 			height: 0,
@@ -68,8 +68,11 @@
 				}, 200);
 			},
 			toSomewhere(){
-				this.$parent.clickCard(this.to);
-				this.$parent.getUserById(this.to.belongId);
+				console.log(this.params);
+				this.$router.push({
+					path: this.to ,
+					query:this.params,
+				})
 			}
 		}
 

@@ -50,6 +50,7 @@
 		},
 		data() {
 			return {
+				courseId:0,
 				index:0,
 				chapterList:[],
 				source: 'http://stream4.iqilu.com/ksd/video/2020/02/17/87d03387a05a0e8aa87370fb4c903133.mp4',
@@ -61,13 +62,30 @@
 				this.index = index;
 				this.$refs.player._setVideoUrl(source)
 			},
+			getChapters(courseId){
+				this.$ajax({
+					url: this.global.serverSrc+'/chapter/getChapters',
+					method: 'post',
+					params:{
+						courseId,
+					}
+				}).then(res => {
+					console.log(res)
+					this.chapterList = res.data.data;
+					this.source = this.chapterList[this.index].chapterUrl;
+					this.changeSource(this.index,this.source)
+				})
+			},
 			getRouterData() {
 				this.index = this.$route.query.index
-				this.chapterList = JSON.parse(this.$route.query.chapterList)
+				this.courseId = this.$route.query.courseId;
+				// this.getChapters(this.courseId);
+				this.getChapters(1);
+				//this.chapterList = JSON.parse(this.$route.query.chapterList)
 				//更换视频地址
-				this.source = this.chapterList[this.index].chapterUrl;
+				//this.source = this.chapterList[this.index].chapterUrl;
 			},
-
+			
 		},
 		created() {
 			this.getRouterData();

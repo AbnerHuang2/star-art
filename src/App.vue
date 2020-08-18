@@ -1,5 +1,5 @@
 <template>
-	<div id="app">
+	<div id="app" v-if="canBeShow">
 		<Header :class="isShow?'':'hidden'"></Header>
 		<div class="main">
 			<router-view></router-view>
@@ -30,11 +30,24 @@
 		},
 		data(){
 			return{
+				canBeShow:false,
 				top:1,
-				isShow:true
+				isShow:true,
 			}
 		},
 		methods: {
+			getUserInfo(){
+				this.$ajax({
+					url: this.global.serverSrc + "/",
+					method: "get",
+					
+				}).then(res => {
+					if(res.data.code==200){
+						this.global.user = res.data.data;
+					}
+					this.canBeShow = true;
+				})
+			},
 			handleScroll() {
 				var scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop
 		
@@ -51,6 +64,7 @@
 			}
 		},
 		created() {
+			this.getUserInfo();
 			window.addEventListener('scroll', this.handleScroll)
 		},
 		// 离开该页面需要移除这个监听的事件

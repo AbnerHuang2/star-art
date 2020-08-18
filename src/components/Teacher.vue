@@ -10,7 +10,7 @@
 					<h5>{{obj.userMajor}}</h5>
 					<p>{{obj.userIntro}}</p>
 					<div class="social-touch">
-						<a href="#">查看主页</a>
+						<a @click="showPersonInfo(obj.id)">查看主页</a>
 					</div>
 				</div>
 			</div>
@@ -34,6 +34,14 @@
 			}
 		},
 		methods:{
+			showPersonInfo(id){
+				this.$router.push({
+					path: '/person' ,
+					query:{
+						id,
+					}
+				})
+			},
 			getTeachers(page,pageSize){
 				this.$ajax({
 					url: this.global.serverSrc + "/teacher/getTeachers",

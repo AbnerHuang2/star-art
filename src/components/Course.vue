@@ -9,8 +9,8 @@
 			</el-col>
 			<el-col :span="10">
 				<div class="course-search">
-					<el-input placeholder="搜索感兴趣的课程"></el-input>
-					<el-button><i class="el-icon-search"></i></el-button>
+					<el-input v-model="courseName" placeholder="搜索感兴趣的课程"></el-input>
+					<el-button @click="clickSearch"><i class="el-icon-search"></i></el-button>
 				</div>
 			</el-col>
 		</el-row>
@@ -89,6 +89,7 @@
 		name: 'Product',
 		data() {
 			return {
+				courseName:'',
 				courseList:[],
 				directList:[],
 				directId:null,//记录上一次点的directId。(给按tag搜索做记录用的)
@@ -112,17 +113,21 @@
 				//把directId清零，防止点击到另一个专业还是搜索上一个专业的directId
 				this.directId = null;
 				this.lastTag = '';
+				this.courseName = '';
 				//获取相关专业的具体
 				this.getDirectsByMajor(this.major[Number(this.activeName)].id);
 				//获取课程
 				this.getCourses(this.major[Number(this.activeName)].id,null,'');
+			},
+			clickSearch(){
+				this.getCourses(null,null,'',this.courseName);
 			},
 			//处理课程卡片点击
 			clickCourse(course){
 				this.$router.push({
 					path: '/courseDetail' ,
 					query:{
-						course:JSON.stringify(course)
+						courseId:course.id
 					}
 				})
 			},
@@ -159,7 +164,7 @@
 				this.lastTag = tag;
 				this.getCourses(this.major[Number(this.activeName)].id,this.directId,tag);
 			},
-			getCourses(majorId,directId,tag,page,pageSize){
+			getCourses(majorId,directId,tag,name,page,pageSize){
 				this.$ajax({
 					url: this.global.serverSrc+'/course/getCourses',
 					method: 'post',
@@ -167,6 +172,7 @@
 						majorId,
 						directId,
 						tag,
+						name,
 						page,
 						pageSize
 					}
@@ -185,7 +191,7 @@
 			},
 			handlePageChange(currentPage){
 				this.currentPage = currentPage;
-				this.getCourses(this.major[Number(this.activeName)].id,this.directId,this.lastTag,this.currentPage);
+				this.getCourses(this.major[Number(this.activeName)].id,this.directId,this.lastTag,this.courseName,this.currentPage);
 			},
 		},
 		created() {

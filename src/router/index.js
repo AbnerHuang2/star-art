@@ -10,7 +10,7 @@ import Community from '../components/Community.vue'
 import NewsDetail from '../components/NewsDetail.vue'
 import NewsArticle from '../components/NewsArticle.vue'
 import Person from '../components/Person.vue'
-
+import Message from '../components/Message.vue'
 import Test from '../components/Test.vue'
 
 Vue.use(VueRouter)
@@ -69,6 +69,11 @@ const routes = [
     path: '/person',
     name: 'Person',
     component: Person
+  },
+  {
+    path: '/message',
+    name: 'Message',
+    component: Message
   },
   {
     path: '/test',

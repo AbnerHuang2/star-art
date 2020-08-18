@@ -56,14 +56,21 @@
 		},
 		methods:{
 			clickMore(majorId){
-				alert(majorId)
 				this.$router.push({
 					path: '/course' ,
 					query:{
 						majorId,
 					}
 				})
-			}
+			},
+			clickCourse(course){
+				this.$router.push({
+					path: '/courseDetail' ,
+					query:{
+						courseId:course.id
+					}
+				})
+			},
 		},
 		created() {
 			

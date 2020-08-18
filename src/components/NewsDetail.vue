@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="show">
 		<div class="main">
 			<div class="title">
 				<h3>{{newsVo.news.newsTitle}}</h3>
@@ -53,6 +53,7 @@
 		},
 		data(){
 			return{
+				show:false,
 				newsVo:{},
 				follow:false,
 				content:'<h2>你好吗</h2>',
@@ -127,8 +128,23 @@
 					}
 				})
 			},
+			getNewsVo(id){
+				this.$ajax({
+					url: this.global.serverSrc+'/news/getNewsById',
+					method: 'post',
+					params:{
+						id,
+					}
+				}).then(res => {
+					if(res.data.code==200){
+						this.newsVo = res.data.data;
+						this.show = true;
+					}
+				})
+			},
 			getRouterData() {
-				this.newsVo = JSON.parse(this.$route.query.newsVo)
+				let newsId = this.$route.query.newsId;
+				this.getNewsVo(newsId);
 			},
 		},
 		created() {

@@ -18,11 +18,13 @@
 			</el-tabs>
 		</div>
 		<div class="card-group" style="padding: 1.875rem 0rem 2.5rem 0rem;">
-			<card v-for="(obj,index) in productList" :key="index" :to="obj" 
-			:data-image="obj.productUrl">
-				<!-- <h1 slot="header">{{obj.productName}}</h1> -->
-				<p slot="content">{{obj.productIntro}}</p>
-			</card>
+			
+			<div v-for="(obj,index) in productList" :key="index" @click="clickCard(obj)">
+				<card :data-image="obj.productUrl">
+					<!-- <h1 slot="header">{{obj.productName}}</h1> -->
+					<p slot="content">{{obj.productIntro}}</p>
+				</card>
+			</div>
 		</div>
 		
 		<div style="text-align: center;margin-bottom: 1.875rem;">

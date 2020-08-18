@@ -1,12 +1,12 @@
 <template>
-	<div class="person">
+	<div v-if="show" class="person">
 		<div class="p-header">
 			<div v-if="form!=null" class="head-img" style="text-align: center; color: #1abc9c;" 
 			@click="clickAvatar">
 				<el-avatar style="width: 100%; height: 100%;" :src="form.userAvatarURL"></el-avatar>
 				<h2>{{form.userNickName}}</h2>
 			</div>
-			
+			<!-- 关注 -->
 			<div v-if="form!=null&&global.user!=null&&form.id != global.user.id" class="follow" @click="follow()">
 				<el-tooltip class="item" effect="dark" :content="followed ? '取消关注':'关注'" placement="bottom">
 					<svg t="1589535208355" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2533"
@@ -19,7 +19,31 @@
 					</svg>
 				</el-tooltip>
 			</div>
+			<!-- 私信 -->
+			<div v-if="form!=null&&global.user!=null&&form.id != global.user.id" 
+			class="contact" @click="msgDialog=true">
+				<el-tooltip class="item" effect="dark" content="私信" placement="bottom">
+					<svg t="1590649254606" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="4423" width="32" height="32"><path d="M512 0c282.8 0 512 229.2 512 512s-229.2 512-512 512S0 794.8 0 512 229.2 0 512 0z" fill="#E9E9FF" p-id="4424"></path><path d="M511.8 268.3c-142.9 0-258.5 101.5-258.5 226.5 0 71.3 38.1 135.1 97 176.5v114.5l113.4-68.6c15.7 2.6 31.7 4.1 48.5 4.1 142.9 0 258.5-101.1 258.5-226.5s-116-226.5-258.9-226.5z" fill="#FFFFFF" p-id="4425"></path><path d="M511.8 462.3c-17.9 0-32.5 14.5-32.5 32.5 0 17.9 14.5 32.5 32.5 32.5 17.9 0 32.5-14.5 32.5-32.5 0-17.9-14.6-32.5-32.5-32.5zM382.7 462.3c-17.9 0-32.5 14.5-32.5 32.5 0 17.9 14.5 32.5 32.5 32.5 17.9 0 32.5-14.5 32.5-32.5-0.4-17.9-14.6-32.5-32.5-32.5zM641.3 462.3c-17.9 0-32.5 14.5-32.5 32.5 0 17.9 14.5 32.5 32.5 32.5s32.5-14.5 32.5-32.5c-0.1-17.9-14.6-32.5-32.5-32.5z" fill="#4545FF" p-id="4426"></path></svg>
+				</el-tooltip>
+			</div>
 		</div>
+		
+		<!-- 私信弹窗 -->
+		<el-dialog title="" :visible.sync="msgDialog">
+			<div style="width: 90%;">
+				<el-row :gutter="20">
+					<el-col style="margin: 1.25rem 0;">
+						<el-input type="textarea" :rows="5" placeholder="请输入内容" v-model="msgContent">
+						</el-input>
+					</el-col>
+					<el-col :offset='20' :span="4">
+						<el-button type="primary" @click="subMsg">发送</el-button>
+					</el-col>
+				</el-row>
+			</div>
+		</el-dialog>
+		<!-- /私信弹窗 -->
+		
 		<!-- avatarDialig -->
 		<el-dialog title="更换头像" :visible.sync="avatarDialig">
 			<div >
@@ -217,9 +241,12 @@
 	export default {
 		data() {
 			return {
+				show:false,
 				id:null,
 				imageUrl:'',
 				avatarDialig:false,
+				msgDialog:false,
+				msgContent:'',
 				followed:false,
 				followList:[],
 				followNum:0,
@@ -250,6 +277,7 @@
 				this.imageUrl = res.data;
 
 				this.form.userAvatarURL = res.data;
+				this.global.user.userAvatarURL = res.data;
 				this.$ajax({
 					url: this.global.serverSrc + '/user/updateUserInfo',
 					method: 'post',
@@ -273,6 +301,29 @@
 					this.$message.error('上传头像图片大小不能超过 2MB!');
 				}
 				return isJPG && isLt2M;
+			},
+			subMsg(){
+				if(this.msgContent==''){
+					this.$notify.warning("内容不能为空");
+					return;
+				}
+				this.$ajax({
+					url: this.global.serverSrc + '/message/addMessage',
+					method: 'post',
+					params: {
+						msgContent:this.msgContent,
+						fromId:this.global.user.id,
+						toId:this.form.id,
+					}
+				}).then(res => {
+					console.log(res)
+					if(res.data.code == 200){
+						this.$notify.success(res.data.message)
+					}else{
+						this.$notify.error(res.data.message)
+					}
+					this.msgDialog = false;
+				})
 			},
 			follow(){
 				if(this.followed){
@@ -479,7 +530,8 @@
 				}).then(res => {
 					if (res.data.code == 200) {
 						this.form = res.data.data;
-
+						//显示页面
+						this.show = true;
 						//获取用户专业
 						this.getMajorById(this.form.userMajor)
 						//获取用户选择的专业
@@ -633,6 +685,11 @@
 		position: absolute;
 		left: 60%;
 		top: 48%;
+	}
+	.contact{
+		position: absolute;
+		left: 66%;
+		top: 50%;
 	}
 
 	.p-nav {
